@@ -1,0 +1,40 @@
+Table accounts as A {
+  id bigserial [pk]
+  user int
+  balance bigint
+  currency varchar(50)
+  created_at timestamptz [default: `now()`]
+  updated_at timestamptz [default: `now()`]
+
+  Indexes {
+    user
+  }
+}
+
+
+
+Table transactions {
+  id bigserial [pk]
+  account_id bigint [ref: > A.id]
+  amount bigint [not null, note: 'can be negative or positive']
+  timestamp timestamptz [default: `now()`]
+
+  Indexes {
+    account_id
+  }
+}
+
+Table Transfers {
+  id bigserial[pk]
+  sender_id bigint [ref: > A.id]
+  receiver_id bigint [ref: > A.id]
+  amount bigint [note: 'must be positive']
+  timestamp timestamptz [default: `now()`]
+
+  Indexes {
+    sender_id
+    receiver_id
+
+    (sender_id, receiver_id)
+  }
+}
