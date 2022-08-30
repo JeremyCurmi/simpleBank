@@ -24,7 +24,7 @@ func main() {
 		logger.Fatal(err.Error())
 	}
 
-	err = dbClient.RunMigrations(*config.MigrationURL, *config.DBURL)
+	err = utils.RunMigrations(logger, *config.MigrationURL, *config.DBURL)
 	if err != nil {
 		logger.Fatal(utils.ErrDBMigrations, zap.Error(err))
 	}

@@ -4,7 +4,6 @@ import (
 	"errors"
 	"time"
 
-	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jmoiron/sqlx"
@@ -15,7 +14,7 @@ import (
 
 type Client struct {
 	logger *zap.Logger
-	conn *sqlx.DB
+	conn   *sqlx.DB
 }
 
 func (c *Client) Close() {
@@ -28,8 +27,8 @@ func (c *Client) Conn() *sqlx.DB {
 
 func New(logger *zap.Logger, url string, connMaxLifetime int) (*Client, error) {
 	var (
-		conn *sqlx.DB
-		err error
+		conn  *sqlx.DB
+		err   error
 		start = time.Now()
 	)
 
@@ -53,29 +52,11 @@ func New(logger *zap.Logger, url string, connMaxLifetime int) (*Client, error) {
 		}
 
 		logger.Warn(utils.WarnDBNotConnected)
-		time.Sleep(time.Second*2)
+		time.Sleep(time.Second * 2)
 	}
 
 	if connMaxLifetime > 0 {
 		conn.SetConnMaxLifetime(time.Duration(connMaxLifetime) * time.Second)
 	}
-	return &Client{logger: logger, conn: conn,}, nil
-}
-
-
-func (c *Client) RunMigrations(migrationURL, dbSource string) error {
-	m, err := migrate.New(migrationURL, dbSource)
-	if err != nil {
-		return err
-	}
-
-	if err = m.Up(); err != nil {
-		if err == migrate.ErrNoChange {
-			c.logger.Info("No changes detected for migrations")
-			return nil
-		}
-		return err
-	}
-	c.logger.Info("Migrations ran successfully ✅")
-	return nil
+	return &Client{logger: logger, conn: conn}, nil
 }

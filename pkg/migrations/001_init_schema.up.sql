@@ -1,10 +1,12 @@
 CREATE TABLE "accounts" (
-  "id" bigserial PRIMARY KEY,
+  "id" bigserial unique,
+  "name" varchar(255),
   "user_id" bigint,
   "balance" bigint,
   "currency" varchar(50),
   "created_at" timestamptz DEFAULT (now()),
-  "updated_at" timestamptz DEFAULT (now())
+  "updated_at" timestamptz DEFAULT (now()),
+  constraint pk_name_user_id primary key (name, user_id)
 );
 
 CREATE TABLE "transfers" (
