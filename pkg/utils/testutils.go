@@ -3,11 +3,11 @@ package utils
 import (
 	"testing"
 
+	"github.com/JeremyCurmi/simpleBank/pkg/config"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jmoiron/sqlx"
 	"github.com/stretchr/testify/require"
-	"gitlab.com/go_projects_jer/simple_bank/pkg/config"
 )
 
 func SetUpTestDB(t *testing.T) *sqlx.DB {

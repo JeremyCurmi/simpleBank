@@ -2,16 +2,17 @@ package crud
 
 import (
 	"fmt"
+	"go.uber.org/zap"
 	"log"
 	"os"
 	"testing"
 
+	"github.com/JeremyCurmi/simpleBank/pkg/utils"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/dockertest"
 	"github.com/ory/dockertest/docker"
-	"gitlab.com/go_projects_jer/simple_bank/pkg/utils"
 )
 
 var (
@@ -21,6 +22,7 @@ var (
 	port     = "5433"
 	dsn      = "postgres://%s:%s@localhost:%s/%s?sslmode=disable"
 	dbConn   *sqlx.DB
+	logger   *zap.Logger = utils.NewLogger()
 )
 
 func TestMain(m *testing.M) {

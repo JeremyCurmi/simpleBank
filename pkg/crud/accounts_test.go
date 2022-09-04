@@ -3,13 +3,10 @@ package crud
 import (
 	"testing"
 
+	"github.com/JeremyCurmi/simpleBank/pkg/models"
+	"github.com/JeremyCurmi/simpleBank/pkg/utils"
 	"github.com/stretchr/testify/require"
-	"gitlab.com/go_projects_jer/simple_bank/pkg/models"
-	"gitlab.com/go_projects_jer/simple_bank/pkg/utils"
-	"go.uber.org/zap"
 )
-
-var logger *zap.Logger = utils.NewLogger()
 
 func TestCreateAccount(t *testing.T) {
 	AccountService := NewAccountsService(logger, dbConn)

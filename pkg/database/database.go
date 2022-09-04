@@ -4,11 +4,11 @@ import (
 	"errors"
 	"time"
 
+	"github.com/JeremyCurmi/simpleBank/pkg/utils"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
-	"gitlab.com/go_projects_jer/simple_bank/pkg/utils"
 	"go.uber.org/zap"
 )
 

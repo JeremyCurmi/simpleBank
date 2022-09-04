@@ -2,17 +2,16 @@ package crud
 
 import (
 	"errors"
-
+	"github.com/JeremyCurmi/simpleBank/pkg/models"
+	"github.com/JeremyCurmi/simpleBank/pkg/utils"
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
-	"gitlab.com/go_projects_jer/simple_bank/pkg/models"
-	"gitlab.com/go_projects_jer/simple_bank/pkg/utils"
 	"go.uber.org/zap"
 )
 
 type AuthService struct {
 	logger *zap.Logger
-	db *sqlx.DB
+	db     *sqlx.DB
 }
 
 func NewAuthService(logger *zap.Logger, db *sqlx.DB) *AuthService {
@@ -36,8 +35,13 @@ func (s *AuthService) ValidateUser(user *models.UserAPI) (string, error) {
 	return token, nil
 }
 
-func (s *AuthService) CreateUser(user *models.UserAPI) error {
-	var err error
+func (s *AuthService) CreateUser(user *models.User) error {
+	hashPassword, err := utils.HashPassword(user.Password)
+	if err != nil {
+		return err
+	}
+
+	user.Password = string(hashPassword)
 	stmt := "INSERT INTO users (username, password) VALUES (:username, :password)"
 	_, err = s.db.NamedExec(stmt, user)
 	if err != nil {

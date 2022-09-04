@@ -1,1 +1,1 @@
-DELETE FROM users WHERE user_id IN (1);
+DELETE FROM users WHERE id IN (99999999);

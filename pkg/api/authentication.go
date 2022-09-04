@@ -3,15 +3,15 @@ package api
 import (
 	"net/http"
 
+	"github.com/JeremyCurmi/simpleBank/pkg/models"
+	"github.com/JeremyCurmi/simpleBank/pkg/utils"
 	"github.com/gin-gonic/gin"
-	"gitlab.com/go_projects_jer/simple_bank/pkg/models"
-	"gitlab.com/go_projects_jer/simple_bank/pkg/utils"
 	"go.uber.org/zap"
 )
 
 const (
-	AuthRoute = "/auth"
-	AuthLoginRoute = "/login"
+	AuthRoute         = "/auth"
+	AuthLoginRoute    = "/login"
 	AuthRegisterRoute = "/register"
 )
 

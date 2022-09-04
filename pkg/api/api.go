@@ -3,18 +3,18 @@ package api
 import (
 	"fmt"
 
+	"github.com/JeremyCurmi/simpleBank/pkg/config"
+	"github.com/JeremyCurmi/simpleBank/pkg/crud"
+	"github.com/JeremyCurmi/simpleBank/pkg/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
-	"gitlab.com/go_projects_jer/simple_bank/pkg/config"
-	"gitlab.com/go_projects_jer/simple_bank/pkg/crud"
-	"gitlab.com/go_projects_jer/simple_bank/pkg/middleware"
 	"go.uber.org/zap"
 )
 
 type Manager struct {
-	logger *zap.Logger
+	logger          *zap.Logger
 	accountsService *crud.AccountsService
-	authService *crud.AuthService
+	authService     *crud.AuthService
 }
 
 func New(logger *zap.Logger, accountsService *crud.AccountsService, authService *crud.AuthService) *Manager {
@@ -59,5 +59,5 @@ func InitAPI(logger *zap.Logger, db *sqlx.DB) error {
 }
 
 func URL() string {
-	return fmt.Sprintf("%s:%s",*config.APIHost, *config.APIPort)
+	return fmt.Sprintf("%s:%s", *config.APIHost, *config.APIPort)
 }

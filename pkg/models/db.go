@@ -3,9 +3,9 @@ package models
 import "time"
 
 type User struct {
-	ID        uint
-	UserName  string
-	Password  string
+	ID        uint      `db:"id"`
+	UserName  string    `db:"username"`
+	Password  string    `db:"password"`
 	CreatedAt time.Time `db:"created_at"`
 }
 

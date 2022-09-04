@@ -3,8 +3,8 @@ package middleware
 import (
 	"net/http"
 
+	"github.com/JeremyCurmi/simpleBank/pkg/utils"
 	"github.com/gin-gonic/gin"
-	"gitlab.com/go_projects_jer/simple_bank/pkg/utils"
 )
 
 func JwtAuthMiddleware() gin.HandlerFunc {

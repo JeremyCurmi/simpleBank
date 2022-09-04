@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
+	"github.com/JeremyCurmi/simpleBank/pkg/config"
 	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
-	"gitlab.com/go_projects_jer/simple_bank/pkg/config"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -19,9 +19,9 @@ func TokenValid(c *gin.Context) error {
 
 func GenerateToken(userID uint) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, jwt.MapClaims{
-		"authorized" : true,
-		"user_id": userID,
-		"exp": time.Now().Add(time.Hour * time.Duration(*config.TokenHourLifeSpan)).Unix(),
+		"authorized": true,
+		"user_id":    userID,
+		"exp":        time.Now().Add(time.Hour * time.Duration(*config.TokenHourLifeSpan)).Unix(),
 	})
 	return token.SignedString([]byte(*config.APISecretKey))
 }
@@ -30,7 +30,7 @@ func GenerateToken(userID uint) (string, error) {
 func ParseJWTToken(c *gin.Context) (*jwt.Token, error) {
 	token := ExtractToken(c)
 
-	jwtKeyFunc := func (token *jwt.Token) (interface{}, error) {
+	jwtKeyFunc := func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("unexpected signing method: %v", token.Header["alg"])
 		}
@@ -63,7 +63,7 @@ func ExtractTokenID(c *gin.Context) (uint, error) {
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if ok && token.Valid {
 		uid, err := strconv.ParseUint(fmt.Sprintf("%.0f", claims["user_id"]), 10, 32)
-		if err!= nil {
+		if err != nil {
 			return 0, err
 		}
 		return uint(uid), nil
@@ -71,7 +71,7 @@ func ExtractTokenID(c *gin.Context) (uint, error) {
 	return 0, nil
 }
 
-func HashPassword(password string)	([]byte, error) {
+func HashPassword(password string) ([]byte, error) {
 	return bcrypt.GenerateFromPassword([]byte(password), bcrypt.DefaultCost)
 }
 

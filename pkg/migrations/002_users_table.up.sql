@@ -1,5 +1,5 @@
 CREATE TABLE "users" (
-  "id" bigserial PRIMARY KEY,
+  "id" bigserial unique,
   "username" varchar(255) NOT NULL UNIQUE,
   "password" varchar(255) NOT NULL,
   "created_at" timestamptz DEFAULT (now())

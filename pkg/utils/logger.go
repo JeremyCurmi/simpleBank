@@ -3,14 +3,14 @@ package utils
 import (
 	"log"
 
-	"gitlab.com/go_projects_jer/simple_bank/pkg/config"
+	"github.com/JeremyCurmi/simpleBank/pkg/config"
 	"go.uber.org/zap"
 	"go.uber.org/zap/zapcore"
 )
 
 const (
-	InfoLevel = "info"
-	WarnLevel = "warn"
+	InfoLevel  = "info"
+	WarnLevel  = "warn"
 	DebugLevel = "debug"
 )
 

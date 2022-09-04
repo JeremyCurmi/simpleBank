@@ -1,8 +1,8 @@
 package crud
 
 import (
+	"github.com/JeremyCurmi/simpleBank/pkg/models"
 	"github.com/jmoiron/sqlx"
-	"gitlab.com/go_projects_jer/simple_bank/pkg/models"
 	"go.uber.org/zap"
 )
 

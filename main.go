@@ -3,10 +3,10 @@ package main
 import (
 	"log"
 
-	"gitlab.com/go_projects_jer/simple_bank/pkg/api"
-	"gitlab.com/go_projects_jer/simple_bank/pkg/config"
-	"gitlab.com/go_projects_jer/simple_bank/pkg/database"
-	"gitlab.com/go_projects_jer/simple_bank/pkg/utils"
+	"github.com/JeremyCurmi/simpleBank/pkg/api"
+	"github.com/JeremyCurmi/simpleBank/pkg/config"
+	"github.com/JeremyCurmi/simpleBank/pkg/database"
+	"github.com/JeremyCurmi/simpleBank/pkg/utils"
 	"go.uber.org/zap"
 )
 
