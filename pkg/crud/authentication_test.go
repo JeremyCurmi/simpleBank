@@ -8,7 +8,6 @@ import (
 )
 
 const (
-	testUserID       uint   = 99999999
 	testPassword     string = "test"
 	testPasswordHash string = "$2a$10$Y0FndaIE3OGvkem/AOPKN.ZOKiXYNzvwL533MG8pPH/sIdLkCZWhi"
 )

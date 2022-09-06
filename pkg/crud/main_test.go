@@ -15,6 +15,11 @@ import (
 	"github.com/ory/dockertest/docker"
 )
 
+const (
+	testUserID  uint = 99999999
+	adminUserID uint = 99999998
+)
+
 var (
 	user     = "postgres"
 	password = "secret"

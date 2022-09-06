@@ -34,7 +34,7 @@ func (m *Manager) login(c *gin.Context) {
 }
 
 func (m *Manager) register(c *gin.Context) {
-	var user *models.UserAPI
+	var user *models.User
 
 	if err := c.ShouldBindJSON(&user); err != nil {
 		utils.SendErrorResponse(c, http.StatusBadRequest, err.Error())
