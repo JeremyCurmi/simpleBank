@@ -23,7 +23,7 @@ func (m *Manager) login(c *gin.Context) {
 		return
 	}
 
-	token, err := m.authService.ValidateUser(user)
+	token, err := m.userService.ValidateUser(user)
 	if err != nil {
 		m.logger.Error("Could not validate user: %v", zap.Error(err))
 		utils.SendErrorResponse(c, http.StatusForbidden, err.Error())
@@ -48,7 +48,7 @@ func (m *Manager) register(c *gin.Context) {
 	}
 	user.Password = string(hashPassword)
 
-	if err := m.authService.CreateUser(user); err != nil {
+	if err := m.userService.CreateUser(user); err != nil {
 		utils.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}

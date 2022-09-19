@@ -2,6 +2,7 @@ package database
 
 import (
 	"errors"
+	"github.com/JeremyCurmi/simpleBank/pkg/models"
 	"time"
 
 	"github.com/JeremyCurmi/simpleBank/pkg/utils"
@@ -59,4 +60,10 @@ func New(logger *zap.Logger, url string, connMaxLifetime int) (*Client, error) {
 		conn.SetConnMaxLifetime(time.Duration(connMaxLifetime) * time.Second)
 	}
 	return &Client{logger: logger, conn: conn}, nil
+}
+
+type DBService interface {
+	Create(model models.DBModel) error
+	Update(queryParams ...interface{}) error
+	Delete(queryParams ...interface{}) error
 }

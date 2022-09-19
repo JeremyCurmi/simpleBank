@@ -17,6 +17,11 @@ func RandomInt(min, max int64) int64 {
 	return min + rand.Int63n(max-min+1)
 }
 
+// RandomFloat generates a random float64 between min and max
+func RandomFloat(min, max float64) float64 {
+	return min + rand.Float64()*(max-min+1)
+}
+
 func RandomString(n int) string {
 	var sb strings.Builder
 	k := len(alp)
@@ -36,8 +41,8 @@ func RandomAccountName() string {
 	return RandomString(8)
 }
 
-func RandomMoney() int64 {
-	return RandomInt(0, 10000)
+func RandomMoney() float64 {
+	return RandomFloat(0, 10000)
 }
 
 func RandomCurrency() string {

@@ -2,7 +2,7 @@ CREATE TABLE "accounts" (
   "id" bigserial unique,
   "name" varchar(255),
   "user_id" bigint,
-  "balance" bigint,
+  "balance" numeric,
   "currency" varchar(50),
   "created_at" timestamptz DEFAULT (now()),
   "updated_at" timestamptz DEFAULT (now()),
@@ -13,7 +13,8 @@ CREATE TABLE "transfers" (
   "id" bigserial PRIMARY KEY,
   "sender_id" bigint,
   "receiver_id" bigint,
-  "amount" bigint,
+  "amount" numeric,
+  "status" varchar(50) DEFAULT ('failed'),
   "timestamp" timestamptz DEFAULT (now())
 );
 

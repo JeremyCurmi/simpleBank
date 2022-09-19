@@ -1,8 +1,7 @@
-package crud
+package services
 
 import (
 	"fmt"
-	"go.uber.org/zap"
 	"log"
 	"os"
 	"testing"
@@ -27,7 +26,7 @@ var (
 	port     = "5433"
 	dsn      = "postgres://%s:%s@localhost:%s/%s?sslmode=disable"
 	dbConn   *sqlx.DB
-	logger   *zap.Logger = utils.NewLogger()
+	logger   = utils.NewLogger()
 )
 
 func TestMain(m *testing.M) {
@@ -70,7 +69,11 @@ func TestMain(m *testing.M) {
 		log.Fatalf("Could not connect to docker: %s", err)
 	}
 
-	defer dbConn.Close()
+	defer func() {
+		if err := dbConn.Close(); err != nil {
+			log.Fatalf("could not close DB connection: %s", err)
+		}
+	}()
 
 	code := m.Run()
 
