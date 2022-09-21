@@ -37,6 +37,10 @@ func RandomUserID() int64 {
 	return RandomInt(0, 1000)
 }
 
+func RandomUserName() string {
+	return RandomString(10)
+}
+
 func RandomAccountName() string {
 	return RandomString(8)
 }
