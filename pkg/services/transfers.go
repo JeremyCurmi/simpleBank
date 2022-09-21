@@ -51,56 +51,69 @@ func (s *TransferService) GetTransfersBySenderAndReceiver(senderID, ReceiverID u
 	}
 	return transfers, nil
 }
-func (s *TransferService) TransferFunds(ctx context.Context, transfer *models.Transfer) error {
+func (s *TransferService) TransferFunds(ctx context.Context, transfer *models.Transfer) (error, error) {
 	fail := func(err error) error {
 		return fmt.Errorf("transfer of funds failed: %v", err)
 	}
-
-	tx, err := s.dbService.BeginTx(ctx, nil)
-	if err != nil {
-		s.logger.Error("failed to begin transaction")
-		return fail(err)
-	}
-
-	defer func() {
-		if err := tx.Rollback(); err != nil {
-			s.logger.Fatal(fmt.Sprintf("failed to rollback transaction: %v", err))
+	transaction := func() error {
+		tx, err := s.dbService.BeginTx(ctx, nil)
+		if err != nil {
+			s.logger.Error("failed to begin transaction")
+			return fail(err)
 		}
-	}()
 
-	if transfer.Amount <= 0 {
-		return fail(fmt.Errorf("amount must be greater than 0"))
-	}
-	senderAccount, err := s.accountsService.GetAccount(transfer.SenderID)
-	if err != nil {
-		s.logger.Error("failed to get sender account")
-		return fail(err)
+		defer func() {
+			if err := tx.Rollback(); err != nil {
+				s.logger.Fatal(fmt.Sprintf("failed to rollback transaction: %v", err))
+			}
+		}()
+
+		if transfer.Amount <= 0 {
+			return fail(fmt.Errorf("amount must be greater than 0"))
+		}
+		senderAccount, err := s.accountsService.GetAccount(transfer.SenderID)
+		if err != nil {
+			s.logger.Error("failed to get sender account")
+			return fail(err)
+		}
+
+		if senderAccount.Balance < transfer.Amount {
+			s.logger.Error("sender does not have enough balance")
+			return fail(fmt.Errorf("sender does not have enough balance"))
+		}
+
+		receiverAccount, err := s.accountsService.GetAccount(transfer.ReceiverID)
+		if err != nil {
+			s.logger.Error("failed to get receiver account")
+			return fail(err)
+		}
+
+		senderAccount.Balance -= transfer.Amount
+		receiverAccount.Balance += transfer.Amount
+
+		err = s.accountsService.UpdateAccountBalance(&senderAccount, transfer.SenderID)
+		if err != nil {
+			s.logger.Error("failed to update sender account")
+			return fail(err)
+		}
+
+		err = s.accountsService.UpdateAccountBalance(&receiverAccount, transfer.ReceiverID)
+		if err != nil {
+			s.logger.Error("failed to update receiver account")
+			return fail(err)
+		}
+
+		transfer.Status = "success"
+		if err := s.CreateTransfer(*transfer); err != nil {
+			s.logger.Error("failed to create transfer record")
+			return fail(err)
+		}
+		return nil
 	}
 
-	if senderAccount.Balance < transfer.Amount {
-		s.logger.Error("sender does not have enough balance")
-		return fail(fmt.Errorf("sender does not have enough balance"))
+	if err := transaction(); err != nil {
+		transfer.Status = "failed"
+		return err, s.CreateTransfer(*transfer)
 	}
-
-	receiverAccount, err := s.accountsService.GetAccount(transfer.ReceiverID)
-	if err != nil {
-		s.logger.Error("failed to get receiver account")
-		return fail(err)
-	}
-
-	senderAccount.Balance -= transfer.Amount
-	receiverAccount.Balance += transfer.Amount
-
-	err = s.accountsService.UpdateAccountBalance(&senderAccount, transfer.SenderID)
-	if err != nil {
-		s.logger.Error("failed to update sender account")
-		return fail(err)
-	}
-
-	err = s.accountsService.UpdateAccountBalance(&receiverAccount, transfer.ReceiverID)
-	if err != nil {
-		s.logger.Error("failed to update receiver account")
-		return fail(err)
-	}
-	return nil
+	return nil, nil
 }

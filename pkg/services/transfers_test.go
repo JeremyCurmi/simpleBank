@@ -56,8 +56,9 @@ func TestTransferFunds(t *testing.T) {
 			ReceiverID: receiverAccount.ID,
 			Amount:     10,
 		}
-		err := transferService.TransferFunds(ctx, &transferData)
-		require.NoError(t, err)
+		txErr, insertErr := transferService.TransferFunds(ctx, &transferData)
+		require.NoError(t, txErr)
+		require.NoError(t, insertErr)
 
 		senderAccount, _ = accountService.GetAccountByName(testUserID, account1Name)
 		require.Equal(t, float64(10), senderAccount.Balance)
@@ -71,9 +72,10 @@ func TestTransferFunds(t *testing.T) {
 			ReceiverID: receiverAccount.ID,
 			Amount:     100,
 		}
-		err := transferService.TransferFunds(ctx, &transferData)
-		require.Error(t, err)
-		require.Equal(t, "transfer of funds failed: sender does not have enough balance", err.Error())
+		txErr, insertErr := transferService.TransferFunds(ctx, &transferData)
+		require.NoError(t, insertErr)
+		require.Error(t, txErr)
+		require.Equal(t, "transfer of funds failed: sender does not have enough balance", txErr.Error())
 	})
 	t.Run("sender sends negative amount", func(t *testing.T) {
 		transferData := models.Transfer{
@@ -81,8 +83,66 @@ func TestTransferFunds(t *testing.T) {
 			ReceiverID: adminUserID,
 			Amount:     -10,
 		}
-		err := transferService.TransferFunds(ctx, &transferData)
-		require.Error(t, err)
-		require.Equal(t, "transfer of funds failed: amount must be greater than 0", err.Error())
+		txErr, insertErr := transferService.TransferFunds(ctx, &transferData)
+		require.NoError(t, insertErr)
+		require.Error(t, txErr)
+		require.Equal(t, "transfer of funds failed: amount must be greater than 0", txErr.Error())
 	})
+}
+
+func TestConcurrentTransfers(t *testing.T) {
+	accountService, transferService := setupTransfers()
+	account1Name := utils.RandomAccountName()
+	account2Name := utils.RandomAccountName()
+	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(200*time.Second))
+	defer cancel()
+	accounts := []models.Account{
+		{
+			UserID:   testUserID,
+			Name:     account1Name,
+			Currency: userCurrency,
+			Balance:  100,
+		},
+		{
+			UserID:   adminUserID,
+			Name:     account2Name,
+			Currency: userCurrency,
+			Balance:  100,
+		},
+	}
+
+	for _, account := range accounts {
+		err := accountService.CreateAccount(account)
+		require.NoError(t, err)
+	}
+
+	senderAccount, err := accountService.GetAccountByName(testUserID, account1Name)
+	require.NoError(t, err)
+
+	receiverAccount, err := accountService.GetAccountByName(adminUserID, account2Name)
+	require.NoError(t, err)
+
+	n := 5
+	txErrs := make(chan error)
+	insertErrs := make(chan error)
+
+	for i := 0; i < n; i++ {
+		go func() {
+			transferData := models.Transfer{
+				SenderID:   senderAccount.ID,
+				ReceiverID: receiverAccount.ID,
+				Amount:     10,
+			}
+			txErr, insertErr := transferService.TransferFunds(ctx, &transferData)
+			txErrs <- txErr
+			insertErrs <- insertErr
+		}()
+	}
+
+	for i := 0; i < n; i++ {
+		txErr := <-txErrs
+		insertErr := <-insertErrs
+		require.NoError(t, txErr)
+		require.NoError(t, insertErr)
+	}
 }

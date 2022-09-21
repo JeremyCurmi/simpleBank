@@ -10,13 +10,13 @@ import (
 )
 
 const (
-	AuthRoute         = "/auth"
+	UserRoute         = "/user"
 	AuthLoginRoute    = "/login"
 	AuthRegisterRoute = "/register"
 )
 
 func (m *Manager) login(c *gin.Context) {
-	var user *models.UserAPI
+	var user *models.User
 
 	if err := c.ShouldBindJSON(&user); err != nil {
 		utils.SendErrorResponse(c, http.StatusBadRequest, err.Error())
@@ -49,6 +49,7 @@ func (m *Manager) register(c *gin.Context) {
 	user.Password = string(hashPassword)
 
 	if err := m.userService.CreateUser(user); err != nil {
+		// TODO: duplicate error handler
 		utils.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
 		return
 	}

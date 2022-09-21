@@ -55,7 +55,7 @@ func TestGetUserByID(t *testing.T) {
 }
 func TestValidateUser(t *testing.T) {
 	userService = setupUsers()
-	user := models.UserAPI{UserName: "admin", Password: testPassword}
+	user := models.User{UserName: "admin", Password: testPassword}
 	token, err := userService.ValidateUser(&user)
 	require.NoError(t, err)
 	require.NotEmpty(t, token)

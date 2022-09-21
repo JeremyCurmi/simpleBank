@@ -42,7 +42,7 @@ func (m *Manager) accountsRoutes(r *gin.RouterGroup) {
 }
 func (m *Manager) transfersRoutes(r *gin.RouterGroup) {}
 func (m *Manager) InitRoutes(r *gin.Engine) {
-	m.userRoutes(r.Group(AuthRoute))
+	m.userRoutes(r.Group(UserRoute))
 	m.accountsRoutes(r.Group(AccountsRoute))
 	m.transfersRoutes(r.Group(TransfersRoute))
 }

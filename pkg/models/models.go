@@ -4,8 +4,8 @@ import "time"
 
 type User struct {
 	ID        uint      `db:"id"`
-	UserName  string    `db:"username"`
-	Password  string    `db:"password"`
+	UserName  string    `json:"username" db:"username"`
+	Password  string    `json:"password" db:"password"`
 	CreatedAt time.Time `db:"created_at"`
 }
 
