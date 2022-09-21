@@ -21,7 +21,7 @@ func NewUserService(logger *zap.Logger, dbService *database.DBUser) *UserService
 		dbService: dbService,
 	}
 }
-func (s *UserService) ValidateUser(user *models.UserAPI) (string, error) {
+func (s *UserService) ValidateUser(user *models.User) (string, error) {
 	userDB, err := s.GetUser(user.UserName)
 	if err != nil {
 		return "", err

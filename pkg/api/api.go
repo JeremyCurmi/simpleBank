@@ -40,7 +40,9 @@ func (m *Manager) accountsRoutes(r *gin.RouterGroup) {
 	r.PUT(AccountByAccountID, m.updateAccount)
 	r.DELETE(AccountByAccountID, m.deleteAccount)
 }
-func (m *Manager) transfersRoutes(r *gin.RouterGroup) {}
+func (m *Manager) transfersRoutes(r *gin.RouterGroup) {
+	r.Use(middleware.JwtAuthMiddleware())
+}
 func (m *Manager) InitRoutes(r *gin.Engine) {
 	m.userRoutes(r.Group(UserRoute))
 	m.accountsRoutes(r.Group(AccountsRoute))

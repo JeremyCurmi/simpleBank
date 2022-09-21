@@ -32,7 +32,6 @@ func (m *Manager) login(c *gin.Context) {
 
 	utils.SendOKResponse(c, http.StatusOK, token)
 }
-
 func (m *Manager) register(c *gin.Context) {
 	var user *models.User
 
@@ -40,13 +39,6 @@ func (m *Manager) register(c *gin.Context) {
 		utils.SendErrorResponse(c, http.StatusBadRequest, err.Error())
 		return
 	}
-	hashPassword, err := utils.HashPassword(user.Password)
-	if err != nil {
-		m.logger.Error("Could not hash password: %v", zap.Error(err))
-		utils.SendErrorResponse(c, http.StatusInternalServerError, err.Error())
-		return
-	}
-	user.Password = string(hashPassword)
 
 	if err := m.userService.CreateUser(user); err != nil {
 		// TODO: duplicate error handler
