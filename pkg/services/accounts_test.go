@@ -43,7 +43,6 @@ func TestUpdateAccount(t *testing.T) {
 	err := accountService.CreateAccount(testAccount)
 	require.NoError(t, err)
 
-	//actualAccount, err := accountService.GetAccount(1)
 	actualAccount, err := accountService.GetAccountByName(testUserID, accountName)
 	require.NoError(t, err)
 	require.NotEmpty(t, actualAccount)

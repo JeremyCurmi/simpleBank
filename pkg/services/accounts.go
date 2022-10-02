@@ -1,6 +1,7 @@
 package services
 
 import (
+	"context"
 	"errors"
 	"github.com/JeremyCurmi/simpleBank/pkg/database"
 	"github.com/JeremyCurmi/simpleBank/pkg/models"
@@ -53,8 +54,17 @@ func (s *AccountsService) GetUserAccounts(userID uint) ([]models.Account, error)
 	}
 	return accounts, nil
 }
-func (s *AccountsService) GetAccount(id uint) (models.Account, error) {
-	account, err := s.dbService.Get(id)
+func (s *AccountsService) GetAccount(id uint, lock bool, ctx context.Context) (models.Account, error) {
+	var (
+		account models.Account
+		err     error
+	)
+	if lock {
+		account, err = s.dbService.GetLock(ctx, id)
+	} else {
+		account, err = s.dbService.Get(id)
+	}
+
 	if err != nil {
 		s.logger.Error("error getting account", zap.Error(err))
 		return models.Account{}, err

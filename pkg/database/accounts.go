@@ -1,6 +1,7 @@
 package database
 
 import (
+	"context"
 	"errors"
 	"github.com/JeremyCurmi/simpleBank/pkg/models"
 	"github.com/jmoiron/sqlx"
@@ -90,6 +91,14 @@ func (s *DBAccount) Get(queryParams ...interface{}) (models.Account, error) {
 	var account models.Account
 	query := `SELECT id, name, user_id, balance, currency, created_at, updated_at FROM accounts WHERE id = $1`
 	if err := s.db.Get(&account, query, queryParams...); err != nil {
+		return models.Account{}, err
+	}
+	return account, nil
+}
+func (s *DBAccount) GetLock(ctx context.Context, queryParams ...interface{}) (models.Account, error) {
+	var account models.Account
+	query := `SELECT * FROM accounts WHERE id = $1 LIMIT 1 FOR UPDATE;`
+	if err := s.db.GetContext(ctx, &account, query, queryParams...); err != nil {
 		return models.Account{}, err
 	}
 	return account, nil

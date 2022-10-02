@@ -11,7 +11,6 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/dockertest"
-	"github.com/ory/dockertest/docker"
 )
 
 const (
@@ -23,10 +22,10 @@ var (
 	user     = "postgres"
 	password = "secret"
 	db       = "postgres"
-	port     = "5433"
-	dsn      = "postgres://%s:%s@localhost:%s/%s?sslmode=disable"
-	dbConn   *sqlx.DB
-	logger   = utils.NewLogger()
+	//port     = "5433"
+	dsn    = "postgres://%s:%s@localhost:%s/%s?sslmode=disable"
+	dbConn *sqlx.DB
+	logger = utils.NewLogger()
 )
 
 func TestMain(m *testing.M) {
@@ -43,12 +42,12 @@ func TestMain(m *testing.M) {
 			"POSTGRES_PASSWORD=" + password,
 			"POSTGRES_DB=" + db,
 		},
-		ExposedPorts: []string{"5432"},
-		PortBindings: map[docker.Port][]docker.PortBinding{
-			"5432": {
-				{HostIP: "0.0.0.0", HostPort: port},
-			},
-		},
+		//ExposedPorts: []string{"5432"},
+		//PortBindings: map[docker.Port][]docker.PortBinding{
+		//	"5432": {
+		//		{HostIP: "0.0.0.0", HostPort: port},
+		//	},
+		//},
 	}
 
 	resource, err := pool.RunWithOptions(&opts)
@@ -56,7 +55,7 @@ func TestMain(m *testing.M) {
 		log.Fatalf("Could not start resource: %s", err.Error())
 	}
 
-	dsn = fmt.Sprintf(dsn, user, password, port, db)
+	dsn = fmt.Sprintf(dsn, user, password, resource.GetPort("5432/tcp"), db)
 	if err = pool.Retry(func() error {
 		dbConn, err = sqlx.Connect("postgres", dsn)
 		if err != nil {

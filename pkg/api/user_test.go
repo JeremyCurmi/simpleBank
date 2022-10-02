@@ -19,7 +19,9 @@ const (
 
 func TestRegisterUser(t *testing.T) {
 	m := setup()
-	r := SetupRouter(m)
+	r := SetupRouter()
+	r.POST(registerEndpoint, m.register)
+	r.POST(loginEndpoint, m.login)
 	t.Run("success", func(t *testing.T) {
 		userName := utils.RandomUserName()
 
@@ -70,7 +72,9 @@ func TestRegisterUser(t *testing.T) {
 
 func TestLoginUser(t *testing.T) {
 	m := setup()
-	r := SetupRouter(m)
+	r := SetupRouter()
+	r.POST(registerEndpoint, m.register)
+	r.POST(loginEndpoint, m.login)
 	t.Run("user exists success", func(t *testing.T) {
 		userName := utils.RandomUserName()
 

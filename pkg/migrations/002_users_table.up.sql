@@ -6,5 +6,4 @@ CREATE TABLE "users" (
 );
 
 ALTER TABLE "accounts" ADD FOREIGN KEY ("user_id") REFERENCES "users" ("id");
-
-
+-- ALTER TABLE "accounts" ADD CONSTRAINT "user_id_currency_key" UNIQUE ("user_id", "currency");

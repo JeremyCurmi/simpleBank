@@ -8,7 +8,6 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/jmoiron/sqlx"
 	"github.com/ory/dockertest"
-	"github.com/ory/dockertest/docker"
 	"io/ioutil"
 	"log"
 	"os"
@@ -16,10 +15,10 @@ import (
 )
 
 var (
-	user              = "postgres"
-	password          = "secret"
-	db                = "postgres"
-	port              = "5433"
+	user     = "postgres"
+	password = "secret"
+	db       = "postgres"
+	//port              = "5433"
 	dsn               = "postgres://%s:%s@localhost:%s/%s?sslmode=disable"
 	dbConn            *sqlx.DB
 	dbConnMaxLifetime = 60
@@ -40,12 +39,12 @@ func TestMain(m *testing.M) {
 			"POSTGRES_PASSWORD=" + password,
 			"POSTGRES_DB=" + db,
 		},
-		ExposedPorts: []string{"5432"},
-		PortBindings: map[docker.Port][]docker.PortBinding{
-			"5432": {
-				{HostIP: "0.0.0.0", HostPort: port},
-			},
-		},
+		//ExposedPorts: []string{"5432"},
+		//PortBindings: map[docker.Port][]docker.PortBinding{
+		//	"5432": {
+		//		{HostIP: "0.0.0.0", HostPort: port},
+		//	},
+		//},
 	}
 
 	resource, err := pool.RunWithOptions(&opts)
@@ -53,7 +52,7 @@ func TestMain(m *testing.M) {
 		log.Fatalf("Could not start resource: %s", err.Error())
 	}
 
-	dsn = fmt.Sprintf(dsn, user, password, port, db)
+	dsn = fmt.Sprintf(dsn, user, password, resource.GetPort("5432/tcp"), db)
 	if err = pool.Retry(func() error {
 		dbConn, err = sqlx.Connect("postgres", dsn)
 		if err != nil {
@@ -94,11 +93,9 @@ func setup() *Manager {
 	return New(logger, accountsService, userService, transferService)
 }
 
-func SetupRouter(m *Manager) *gin.Engine {
+func SetupRouter() *gin.Engine {
 	r := gin.New()
 	gin.SetMode(gin.ReleaseMode)
 	gin.DefaultWriter = ioutil.Discard
-	r.POST(registerEndpoint, m.register)
-	r.POST(loginEndpoint, m.login)
 	return r
 }

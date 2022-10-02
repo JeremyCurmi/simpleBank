@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"fmt"
 	"github.com/JeremyCurmi/simpleBank/pkg/database"
 	"github.com/JeremyCurmi/simpleBank/pkg/models"
 	"github.com/JeremyCurmi/simpleBank/pkg/utils"
@@ -94,8 +95,6 @@ func TestConcurrentTransfers(t *testing.T) {
 	accountService, transferService := setupTransfers()
 	account1Name := utils.RandomAccountName()
 	account2Name := utils.RandomAccountName()
-	ctx, cancel := context.WithTimeout(context.Background(), time.Duration(200*time.Second))
-	defer cancel()
 	accounts := []models.Account{
 		{
 			UserID:   testUserID,
@@ -122,18 +121,22 @@ func TestConcurrentTransfers(t *testing.T) {
 	receiverAccount, err := accountService.GetAccountByName(adminUserID, account2Name)
 	require.NoError(t, err)
 
-	n := 5
+	n := 1
+	transferAmt := float64(10)
 	txErrs := make(chan error)
 	insertErrs := make(chan error)
 
 	for i := 0; i < n; i++ {
+		txName := fmt.Sprintf("tx %d", i+1)
 		go func() {
-			transferData := models.Transfer{
+			//ctx, cancel := context.WithTimeout(context.Background(), time.Duration(3*time.Second))
+			//defer cancel()
+			ctx := context.WithValue(context.Background(), txKey, txName)
+			txErr, insertErr := transferService.TransferFunds(ctx, &models.Transfer{
 				SenderID:   senderAccount.ID,
 				ReceiverID: receiverAccount.ID,
-				Amount:     10,
-			}
-			txErr, insertErr := transferService.TransferFunds(ctx, &transferData)
+				Amount:     transferAmt,
+			})
 			txErrs <- txErr
 			insertErrs <- insertErr
 		}()
@@ -145,4 +148,16 @@ func TestConcurrentTransfers(t *testing.T) {
 		require.NoError(t, txErr)
 		require.NoError(t, insertErr)
 	}
+
+	expectedSenderBalance := accounts[0].Balance - float64(n)*transferAmt
+	senderAccount, err = accountService.GetAccountByName(testUserID, account1Name)
+	require.NoError(t, err)
+	require.Equal(t, expectedSenderBalance, senderAccount.Balance, "Sender remaining balance not as expected")
+	require.Greater(t, expectedSenderBalance, 0.0)
+
+	expectedRecieverBalance := accounts[1].Balance + float64(n)*transferAmt
+	receiverAccount, err = accountService.GetAccountByName(adminUserID, account2Name)
+	require.NoError(t, err)
+	require.Equal(t, expectedRecieverBalance, receiverAccount.Balance, "Receiver remaining balance not as expected")
+	require.Greater(t, expectedRecieverBalance, 100.0)
 }

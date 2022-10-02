@@ -11,8 +11,8 @@ CREATE TABLE "accounts" (
 
 CREATE TABLE "transfers" (
   "id" bigserial PRIMARY KEY,
-  "sender_id" bigint,
-  "receiver_id" bigint,
+  "sender_id" bigint NOT NULL,
+  "receiver_id" bigint NOT NULL,
   "amount" numeric,
   "status" varchar(50) DEFAULT ('failed'),
   "timestamp" timestamptz DEFAULT (now())
@@ -20,8 +20,8 @@ CREATE TABLE "transfers" (
 
 CREATE TABLE "transactions" (
   "id" bigserial PRIMARY KEY,
-  "account_id" bigint,
-  "amount" bigint NOT NULL,
+  "account_id" bigint NOT NULL,
+  "amount" numeric NOT NULL,
   "timestamp" timestamptz DEFAULT (now())
 );
 
